@@ -1,0 +1,34 @@
+﻿@page "/rag"
+@page "/rag/index"
+@attribute [Route("/rag/index2")]
+@inject NavigationManager Navigation
+
+<div class="header">
+    <div>
+        <Input Placeholder="Basic usage" @bind-Value="@Search" Width="300"/>
+        <Button>搜索</Button>
+    </div>
+    <div>
+        <Button Type="ButtonType.Primary" @onclick="@(() => NavigationToAddOrEditPage("add"))">新增</Button>
+        <Button>Default</Button>
+    </div>
+</div>
+
+
+<style>
+    .header {
+        display: flex;
+        justify-content: space-between
+    }
+
+</style>
+
+@code {
+
+    public string? Search { get; set; }
+
+    public void NavigationToAddOrEditPage(string action, string? param = null)
+    {
+        Navigation.NavigateTo($"/rag/{action}");
+    }
+}

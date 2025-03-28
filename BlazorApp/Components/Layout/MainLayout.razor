@@ -1,0 +1,73 @@
+﻿@inherits LayoutComponentBase
+
+<Layout Id="components-layout-demo-custom-trigger" Style="height: 100%">
+    <Sider @bind-Collapsed=@collapsed NoTrigger OnCollapse="OnCollapse">
+        <div class="logo" />
+        <Menu Theme="MenuTheme.Dark" Mode="MenuMode.Inline" DefaultSelectedKeys=@(new[]{"1"})>
+            <MenuItem Key="1" RouterLink="/">
+                <Icon Type="@IconType.Outline.Dashboard" />
+                <span>Dashboard</span>
+            </MenuItem>
+            <MenuItem Key="2" RouterLink="/rag">
+                <Icon Type="@IconType.Outline.Book" />
+                <span>知识库</span>
+            </MenuItem>
+        </Menu>
+    </Sider>
+    <Layout Class="site-layout">
+        <Header Class="site-layout-background" Style="padding: 0;">
+            @if (collapsed) {
+                <Icon Type="@IconType.Outline.MenuUnfold" Class="trigger" OnClick="toggle" />
+            } else {
+                <Icon Type="@IconType.Outline.MenuFold" Class="trigger" OnClick="toggle" />
+            }
+        </Header>
+        
+        <Content Class="site-layout-background" Style="margin: 5px 5px;padding: 5px;min-height: 280px;">
+            <MyBreadcrumb />
+            <div style="padding: 5px; 0px">
+                @Body
+            </div>
+            
+        </Content>
+    </Layout>
+</Layout>
+
+<style>
+    #components-layout-demo-custom-trigger .trigger {
+        font-size: 18px;
+        line-height: 64px;
+        padding: 0 24px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+        #components-layout-demo-custom-trigger .trigger:hover {
+            color: #1890ff;
+        }
+
+    #components-layout-demo-custom-trigger .logo {
+        height: 32px;
+        background: rgba(255, 255, 255, 0.2);
+        margin: 16px;
+    }
+
+    .site-layout .site-layout-background {
+        background: #fff;
+    }
+
+</style>
+
+@code {
+    bool collapsed;
+
+    void toggle() {
+        collapsed = !collapsed;
+    }
+
+    void OnCollapse(bool isCollapsed) {
+        Console.WriteLine($"Collapsed: {isCollapsed}");
+    }
+}
+
+

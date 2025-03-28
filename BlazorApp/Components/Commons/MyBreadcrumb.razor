@@ -1,0 +1,91 @@
+﻿@inject IMessageService _message
+@inject NavigationManager Navigation
+
+@if(Urls.Count <= 1)
+{
+
+}
+else
+{
+    <Breadcrumb>
+        @foreach (var item in Urls) {
+            <BreadcrumbItem Href="@item.Url">@item.Name</BreadcrumbItem>
+        }
+    </Breadcrumb>
+}
+
+
+
+@code {
+
+    private string? BaseUrl { get; set; }
+
+
+    private List<UrlModel> Urls { get; set; } = new List<UrlModel>();
+
+    public void OnClickItem(MouseEventArgs args) {
+        _message.Success($"You clicked the breadcrumb.");
+    }
+
+    protected override void OnInitialized()
+    {
+        var currentUrl = Navigation.Uri;
+        var baseUrl = Navigation.BaseUri;
+        BaseUrl = baseUrl;
+
+        ReBreadcrumbLoad(currentUrl);
+
+        // 订阅 onChange 事件
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e) {
+        // 可以在这里执行其他操作，比如更新组件状态等
+        ReBreadcrumbLoad(e.Location);
+    }
+
+    /// <summary>
+    /// 重载面包屑导航
+    /// </summary>
+    /// <param name="url"></param>
+    public void ReBreadcrumbLoad(string url)
+    {
+        var baseUrl = Navigation.BaseUri;
+        if(BaseUrl == null)
+        {
+            BaseUrl = baseUrl;
+        }
+        Urls.Clear();
+        var uri = url.Replace(BaseUrl, "").Split("/");
+
+        for (int i = 0; i < uri.Length; i++)
+        {
+            List<string> data = new List<string>();
+            for (int j = i; j >= 0; j--)
+            {
+                data.Add(uri[j]);
+            }
+            data.Reverse();
+            var endpoint = string.Join('/', data);
+            Urls.Add(new UrlModel
+            {
+                Name = uri[i],
+                Url = endpoint
+            });
+        }
+        Console.WriteLine(Urls.Count);
+        StateHasChanged();
+    }
+
+    public void Dispose() {
+        // 取消订阅事件以避免内存泄漏
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+
+    class UrlModel
+    {
+        public string? Name { get; set; }
+        public string? Url { get; set; }
+    }
+}

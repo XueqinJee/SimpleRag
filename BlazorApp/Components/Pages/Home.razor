@@ -1,0 +1,16 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+
+<PageTitle>首页</PageTitle>
+
+<h1>Hello, world!</h1>
+
+<Button Type="ButtonType.Primary" @onclick="NavigateToRagRout">跳转</Button>
+
+@code{
+
+    private void NavigateToRagRout(MouseEventArgs args)
+    {
+        Navigation.NavigateTo("/rag");
+    }
+}

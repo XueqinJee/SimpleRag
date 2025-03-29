@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Simepe.App.Components.Commons
+@inherits LayoutComponentBase
 
 <Layout Id="components-layout-demo-custom-trigger" Style="height: 100%">
     <Sider @bind-Collapsed=@collapsed NoTrigger OnCollapse="OnCollapse">
@@ -11,6 +12,14 @@
             <MenuItem Key="2" RouterLink="/rag">
                 <Icon Type="@IconType.Outline.Book" />
                 <span>知识库</span>
+            </MenuItem>
+            <MenuItem Key="3" RouterLink="/counter">
+                <Icon Type="@IconType.Outline.Tool" />
+                <span>计数器</span>
+            </MenuItem>
+            <MenuItem Key="4" RouterLink="/from">
+                <Icon Type="@IconType.Outline.HeatMap" />
+                <span>表单验证</span>
             </MenuItem>
         </Menu>
     </Sider>

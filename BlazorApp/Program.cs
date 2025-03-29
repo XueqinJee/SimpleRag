@@ -1,4 +1,4 @@
-using BlazorApp.Components;
+using Simepe.App.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

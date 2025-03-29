@@ -1,8 +1,54 @@
 ﻿@page "/rag/add"
 @page "/rag/edit"
 
-<h3>AddOrEditRag</h3>
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json;
+@using System.ComponentModel
+@inject NavigationManager Navigation
 
-@code {
+<Form Model="@model"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed"
+      LabelColSpan="4"
+      WrapperColSpan="16">
+    <FormItem Label="知识库名称">
+        <Input @bind-Value="@context.Username" />
+    </FormItem>
+    <FormItem Label="图标">
+        <InputPassword @bind-Value="@context.Password" />
+    </FormItem>
+    <FormItem Label="Embedded模型">
+        <InputPassword @bind-Value="@context.Password" />
+    </FormItem>
+    <FormItem Label="描述">
+        <InputPassword @bind-Value="@context.Password" />
+    </FormItem>
+    <FormItem WrapperColOffset="4" WrapperColSpan="16">
+        <Button Type="ButtonType.Primary" HtmlType="submit">
+            提交
+        </Button>
+        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/rag"))">
+            返回
+        </Button>
+    </FormItem>
+</Form>
+@code
+{
+    public class Model {
+        [Required]
+        public string Username { get; set; }
+        [Required]
+        public string Password { get; set; }
+        public bool RememberMe { get; set; } = true;
+    }
 
+    private Model model = new Model();
+
+    private void OnFinish(EditContext editContext) {
+        Console.WriteLine($"Success:{JsonSerializer.Serialize(model)}");
+    }
+
+    private void OnFinishFailed(EditContext editContext) {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(model)}");
+    }
 }

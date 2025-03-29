@@ -1,0 +1,57 @@
+﻿@page "/from"
+@using System.ComponentModel.DataAnnotations
+
+<h3>FromValidate</h3>
+
+<EditForm Model=@forecast EditContext=editContext OnSubmit="Submit">
+    <div>
+        <InputDate @bind-Value=forecast.Date />
+        <ValidationMessage For="@(() => forecast.Date)"/>
+    </div>
+    <div>
+        <InputText @bind-Value=forecast.Temperature />
+        <ValidationMessage For="@(() => forecast.Temperature)" />
+    </div>
+    <div>
+        <InputTextArea @bind-Value=forecast.Summary />
+        <ValidationMessage For="@(() => forecast.Summary)" />
+    </div>
+    <div>
+        <input type="submit" value="保存"/>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    private Forecast forecast = new Forecast();
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new(forecast);
+        editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e) {
+        if (!editContext.Validate())
+        {
+            Console.WriteLine("验证未通过：" + editContext.GetValidationMessages());
+        }
+        StateHasChanged();
+    }
+
+    private void Submit()
+    {
+        // Todo .....
+    }
+
+    public class Forecast
+    {
+        [Required(ErrorMessage = "日期不可为空！")]
+        public DateTime Date { get; set; }
+
+        [Required(ErrorMessage = "温度不可为空！")]
+        public string? Temperature { get; set; }
+        public string? Summary { get; set; }
+    }
+}

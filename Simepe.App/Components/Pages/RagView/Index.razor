@@ -1,0 +1,81 @@
+﻿@page "/rag"
+@page "/rag/index"
+@attribute [Route("/rag/index2")]
+@inject NavigationManager Navigation
+@inject KnowledgeService knowledgeService
+<div class="header">
+    <div>
+        <Input Placeholder="Basic usage" @bind-Value="@Search" Width="300"/>
+        <Button>搜索</Button>
+    </div>
+    <div>
+        <Button Type="ButtonType.Primary" @onclick="@(() => NavigationToAddOrEditPage("add"))">新增</Button>
+    </div>
+</div>
+
+<Table TItem="Knowledge" DataSource="@List">
+    <ColumnDefinitions Context="row">
+        <PropertyColumn Title="编号" Property="c => c.Id"></PropertyColumn>
+        <PropertyColumn Title="标题" Property="c => c.Name"></PropertyColumn>
+        <PropertyColumn Title="图标" Property="c => c.Icon"></PropertyColumn>
+        <PropertyColumn Title="Embedded" Property="c => c.EmbeddedId"></PropertyColumn>
+        <PropertyColumn Title="描述" Property="c => c.Description"></PropertyColumn>
+        <ActionColumn Title="操作">
+            <Space Size="SpaceSize.Middle">
+                <SpaceItem>
+                    <Button Type="ButtonType.Primary" Size="ButtonSize.Small" Icon="@IconType.Outline.InfoCircle" Ghost>详情</Button>
+                </SpaceItem>
+                <SpaceItem>
+                    <Button @onclick="() => OnAddHandler(row)"
+                            Type="ButtonType.Primary" Size="ButtonSize.Small"
+                            Icon="@IconType.Outline.Edit">
+                        编辑
+                    </Button>
+                </SpaceItem>
+                <SpaceItem>
+                    <Button @onclick="() => OnDeleteHandler(row)"
+                            Type="ButtonType.Dashed" Size="ButtonSize.Small" Icon="@IconType.Outline.Delete" Danger>
+                        删除
+                    </Button>
+                </SpaceItem>
+            </Space>
+        </ActionColumn>
+    </ColumnDefinitions>
+</Table>
+
+<style>
+    .header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+</style>
+
+@code {
+
+    public string? Search { get; set; }
+    private List<Knowledge> List = new List<Knowledge>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        List = await knowledgeService.GetKnowledgeList();
+    }
+
+    public void NavigationToAddOrEditPage(string action, string? param = null)
+    {
+        Navigation.NavigateTo($"/rag/{action}");
+    }
+
+    public Task OnAddHandler(Knowledge model) {
+
+        Navigation.NavigateTo($"/rag/edit/{model.Id}");
+        return Task.CompletedTask;
+    }
+
+    public async Task OnDeleteHandler(Knowledge model) {
+
+        await knowledgeService.DeleteById(model.Id);
+        List = await knowledgeService.GetKnowledgeList();
+    }
+}

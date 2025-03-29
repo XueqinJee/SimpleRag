@@ -1,0 +1,47 @@
+﻿
+<Select Style="width: 200px;"
+        ValueProperty="c=>c"
+        LabelProperty="c=>c"
+        DataSource="_currentNames"
+        DropdownMatchSelectWidth="false"
+        ListboxStyle="display:flex;height: 200px;flex-flow: wrap; max-width: 500px; align-content: baseline;">
+    <ItemTemplate>
+        <Icon Type="@context" />
+    </ItemTemplate>
+    <LabelTemplate>
+        <p style="line-height: 30px;"><Icon Type="@context" /> @context</p>
+    </LabelTemplate>
+    <DropdownRender>
+        <Tabs>
+            @foreach (var item in availableIcons) {
+                <TabPane Key="@item" Tab="@item"> </TabPane>
+            }
+        </Tabs>
+        @context
+    </DropdownRender>
+</Select>
+
+
+@code
+{
+    private List<string> _currentNames;
+    private string[] availableIcons = new string[]
+    {
+        "bank",
+        "user",
+        "mail",
+        "setting",
+        "smile"
+    };
+
+
+    private Dictionary<string, List<string>> _lstIcons;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+    }
+
+    private void OnChange(string tab) {
+        _currentNames = _lstIcons[tab];
+    }
+}

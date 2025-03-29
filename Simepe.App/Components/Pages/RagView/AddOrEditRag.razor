@@ -1,0 +1,103 @@
+﻿@page "/rag/add"
+@page "/rag/edit/{Id:int}"
+@inject NavigationManager Navigation
+@inject KnowledgeService knowledgeService
+@inject IMessageService _message
+
+<Form Model="@model"
+OnFinish="OnFinish"
+OnFinishFailed="OnFinishFailed"
+LabelColSpan="4"
+WrapperColSpan="16">
+    <FormItem Label="知识库名称">
+        <Input @bind-Value="@context.Name" />
+    </FormItem>
+    <FormItem Label="图标">
+        <Input @bind-Value="@context.Icon" />
+    </FormItem>
+    <FormItem Label="Embedded模型">
+    </FormItem>
+    <FormItem Label="描述">
+        <Input @bind-Value="@context.Description" />
+    </FormItem>
+    <FormItem WrapperColOffset="4" WrapperColSpan="16">
+        <Button Type="ButtonType.Primary" HtmlType="submit">
+            提交
+        </Button>
+        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/rag"))">
+            返回
+        </Button>
+    </FormItem>
+</Form>
+
+@code
+{
+    [Parameter]
+    public int? Id { get; set; }
+    public bool IsEdit { get; set; }
+    private Model model = new Model();
+
+    public class Model {
+        [Required]
+        public string? Name { get; set; }
+        [Required]
+        public string? Icon { get; set; }
+
+        public int EmbeddedId { get; set; }
+
+        [Required]
+        public string? Description { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsEdit = Id == null ? false : true;
+        if (!IsEdit)
+        {
+            return;
+        }
+        var data = await knowledgeService.GetKnowledgeById(Id);
+        if(data == null)
+        {
+            Navigation.NavigateTo("/rag");
+            await _message.Warning($"ID {Id} 不存在！").ConfigureAwait(false);
+            return;
+        }
+        model.Name = data.Name;
+        model.Icon = data.Icon;
+        model.EmbeddedId = data.EmbeddedId;
+        model.Description = data.Description;
+    }
+
+    private async Task OnFinish(EditContext editContext) {
+        var data = new Knowledge
+        {
+            Name = model.Name,
+            Icon = model.Icon,
+            Description = model.Description
+        };
+        bool result;
+
+        if (IsEdit)
+        {
+            data.Id = (int)Id;
+            result = await knowledgeService.UpdateKnowledge(data);
+        }
+        else
+        {
+            result = await knowledgeService.AddKnowledge(data);
+        }
+
+        if (result)
+        {
+            Navigation.NavigateTo("/rag");
+            await _message.Success("执行成功！").ConfigureAwait(false);
+            return;
+        }
+        await _message.Error("添加失败！");
+    }
+
+    private void OnFinishFailed(EditContext editContext) {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(model)}");
+    }
+}

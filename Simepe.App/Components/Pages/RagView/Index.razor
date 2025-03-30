@@ -23,7 +23,9 @@
         <ActionColumn Title="操作">
             <Space Size="SpaceSize.Middle">
                 <SpaceItem>
-                    <Button Type="ButtonType.Primary" Size="ButtonSize.Small" Icon="@IconType.Outline.InfoCircle" Ghost>详情</Button>
+                    <Button Type="ButtonType.Primary" Size="ButtonSize.Small" 
+                        @onclick="@(() => Navigation.NavigateTo($"/rag/info/{row.Id}"))"
+                        Icon="@IconType.Outline.InfoCircle" Ghost>详情</Button>
                 </SpaceItem>
                 <SpaceItem>
                     <Button @onclick="() => OnAddHandler(row)"

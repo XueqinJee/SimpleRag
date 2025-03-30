@@ -1,0 +1,55 @@
+﻿@page "/rag/info/{Id:int}"
+@inject KnowledgeInfoService KnowledgeInfoService
+
+<h3>知识库</h3>
+<Upload Action="/api/vault/upload"
+Name="files"
+OnSingleCompleted="OnSingleCompleted">
+    <Button Type="ButtonType.Primary" Ghost Icon="@IconType.Outline.Upload">文件上传</Button>
+</Upload>
+
+<Table TItem="KnowledgeInfo" DataSource="@datas">
+    <ColumnDefinitions Context="row">
+        <PropertyColumn Title="编号" Property="p => p.Id"></PropertyColumn>
+        <PropertyColumn Title="文件名称" Property="p => p.FileName"></PropertyColumn>
+        <PropertyColumn Title="大小" Property="p => p.Size"></PropertyColumn>
+        <PropertyColumn Title="切片数" Property="p => p.Chunks"></PropertyColumn>
+        <PropertyColumn Title="状态" Property="p => p.State"></PropertyColumn>
+        <PropertyColumn Title="创建时间" Property="p => p.CreateTime"></PropertyColumn>
+        <ActionColumn Title="操作">
+            <Space Size="SpaceSize.Small">
+                <SpaceItem>
+                    <Button Size="ButtonSize.Small">开始</Button>
+                </SpaceItem>
+            </Space>
+        </ActionColumn>
+    </ColumnDefinitions>
+</Table>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private IEnumerable<KnowledgeInfo> datas = new List<KnowledgeInfo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        datas = await KnowledgeInfoService.GetAllAsync();
+    }
+
+    async Task OnSingleCompleted(UploadInfo fileinfo) {
+        if (fileinfo.File.State == UploadState.Success) {
+            var result = fileinfo.File.GetResponse<List<VaultUploadFileViewModel>>();
+
+            var top = result.First();
+            var data = new KnowledgeInfo {
+                    FileName = top.Name,
+                    Size = top.Size,
+                    State = Model.Enum.FileStateEnum.准备,
+                    KnowledgeId = Id,
+                };
+            await KnowledgeInfoService.AddAsync(data);
+        }
+        datas = await KnowledgeInfoService.GetAllAsync();
+    }
+}

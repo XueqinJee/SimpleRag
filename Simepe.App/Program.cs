@@ -10,11 +10,12 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddAntDesign();
-
+builder.Services.AddControllers();
 builder.Services.AddDbContext<MyDbContext>(options => {
     options.UseSqlite("Data Source=mydb.db");
 });
 builder.Services.AddScoped<KnowledgeService>();
+builder.Services.AddScoped<KnowledgeInfoService>();
 
 var app = builder.Build();
 
@@ -28,5 +29,7 @@ app.UseStatusCodePagesWithRedirects("/404");
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapControllers();
 
 app.Run();

@@ -5,45 +5,58 @@
 @inject KnowledgeService knowledgeService
 <div class="header">
     <div>
-        <Input Placeholder="Basic usage" @bind-Value="@Search" Width="300"/>
-        <Button>搜索</Button>
+        <Input Placeholder="Basic usage" @bind-Value="@Search" Width="300" />
+        <Button @onclick="@(() => GetNavigationSearch())">搜索</Button>
     </div>
     <div>
         <Button Type="ButtonType.Primary" @onclick="@(() => NavigationToAddOrEditPage("add"))">新增</Button>
     </div>
 </div>
 
-<Table TItem="Knowledge" DataSource="@List">
-    <ColumnDefinitions Context="row">
-        <PropertyColumn Title="编号" Property="c => c.Id"></PropertyColumn>
-        <PropertyColumn Title="标题" Property="c => c.Name"></PropertyColumn>
-        <PropertyColumn Title="图标" Property="c => c.Icon"></PropertyColumn>
-        <PropertyColumn Title="Embedded" Property="c => c.EmbeddedId"></PropertyColumn>
-        <PropertyColumn Title="描述" Property="c => c.Description"></PropertyColumn>
-        <ActionColumn Title="操作">
-            <Space Size="SpaceSize.Middle">
-                <SpaceItem>
-                    <Button Type="ButtonType.Primary" Size="ButtonSize.Small" 
-                        @onclick="@(() => Navigation.NavigateTo($"/rag/info/{row.Id}"))"
-                        Icon="@IconType.Outline.InfoCircle" Ghost>详情</Button>
-                </SpaceItem>
-                <SpaceItem>
-                    <Button @onclick="() => OnAddHandler(row)"
-                            Type="ButtonType.Primary" Size="ButtonSize.Small"
-                            Icon="@IconType.Outline.Edit">
-                        编辑
-                    </Button>
-                </SpaceItem>
-                <SpaceItem>
-                    <Button @onclick="() => OnDeleteHandler(row)"
-                            Type="ButtonType.Dashed" Size="ButtonSize.Small" Icon="@IconType.Outline.Delete" Danger>
-                        删除
-                    </Button>
-                </SpaceItem>
-            </Space>
-        </ActionColumn>
-    </ColumnDefinitions>
-</Table>
+
+<Spin Spinning=@IsLoad Delay="100">
+    <Table TItem="Knowledge" PageSize="@pageSize" Total="@total" DataSource="@List">
+        <ColumnDefinitions Context="row">
+            <PropertyColumn Title="编号" Property="c => c.Id"></PropertyColumn>
+            <PropertyColumn Title="标题" Property="c => c.Name"></PropertyColumn>
+            <PropertyColumn Title="图标" Property="c => c.Icon"></PropertyColumn>
+            <PropertyColumn Title="Embedded" Property="c => c.EmbeddedId"></PropertyColumn>
+            <PropertyColumn Title="描述" Property="c => c.Description"></PropertyColumn>
+            <ActionColumn Title="操作">
+                <Space Size="SpaceSize.Middle">
+                    <SpaceItem>
+                        <Button Type="ButtonType.Primary" Size="ButtonSize.Small"
+                                @onclick="@(() => Navigation.NavigateTo($"/rag/info/{row.Id}"))"
+                                Icon="@IconType.Outline.InfoCircle" Ghost>
+                            详情
+                        </Button>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Button @onclick="() => OnAddHandler(row)"
+                                Type="ButtonType.Primary" Size="ButtonSize.Small"
+                                Icon="@IconType.Outline.Edit">
+                            编辑
+                        </Button>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Button @onclick="() => OnDeleteHandler(row)"
+                                Type="ButtonType.Dashed" Size="ButtonSize.Small" Icon="@IconType.Outline.Delete" Danger>
+                            删除
+                        </Button>
+                    </SpaceItem>
+                </Space>
+            </ActionColumn>
+        </ColumnDefinitions>
+
+        <PaginationTemplate>
+            <Pagination Total="@total"
+                        PageSize="@pageSize"
+                        Current="@pageNumber"
+                        ShowSizeChanger
+                        OnChange="OnPageChangeHandler" />
+        </PaginationTemplate>
+    </Table>
+</Spin>
 
 <style>
     .header {
@@ -57,15 +70,37 @@
 @code {
 
     public string? Search { get; set; }
-    private List<Knowledge> List = new List<Knowledge>();
+    private IEnumerable<Knowledge> List = new List<Knowledge>();
+    private int totalPage;
+    private int pageSize = 2;
+    private int total;
+    private int pageNumber = 1;
+    private bool IsLoad = false;
 
-    protected override async Task OnInitializedAsync()
-    {
-        List = await knowledgeService.GetKnowledgeList();
+    protected override async Task OnInitializedAsync() {
+        await GetNavigationSearch();
     }
 
-    public void NavigationToAddOrEditPage(string action, string? param = null)
-    {
+    public async Task GetNavigationSearch() {
+        IsLoad = true;
+        if (Search == null) {
+            Search = "";
+        }
+        var data = await knowledgeService.GetPaginatedAsync(pageNumber, pageSize, d => d.Name != null && d.Name.Contains(Search));
+        List = data.items;
+        total = data.totalCount;
+
+        await Task.Delay(100).ConfigureAwait(false);
+        IsLoad = false;
+    }
+
+    public async Task OnPageChangeHandler(PaginationEventArgs args) {
+        pageNumber = args.Page;
+        pageSize = args.PageSize;
+        await GetNavigationSearch();
+    }
+
+    public void NavigationToAddOrEditPage(string action, string? param = null) {
         Navigation.NavigateTo($"/rag/{action}");
     }
 

@@ -11,7 +11,7 @@ namespace ClassLibrary.Services.Base
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseModel {
 
-        private readonly MyDbContext _myDbContext;
+        protected readonly MyDbContext _myDbContext;
         public readonly DbSet<T> _dbSet;
         public GenericRepository(MyDbContext myDbContext) {
             _myDbContext = myDbContext;
@@ -31,7 +31,7 @@ namespace ClassLibrary.Services.Base
                 .ToListAsync();
 
             int totalPage = (int)Math.Ceiling((double)totalCount / pageSize);
-            return (items, totalCount, totalCount, pageNumber, pageSize);
+            return (items, totalCount, totalPage, pageNumber, pageSize);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync() {

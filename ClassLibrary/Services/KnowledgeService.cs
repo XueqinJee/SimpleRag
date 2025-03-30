@@ -1,12 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ClassLibrary.Services.Base;
+using Microsoft.EntityFrameworkCore;
 using Model;
 using Model.Models;
 
 namespace ClassLibrary.Services
 {
-    public class KnowledgeService(
-        MyDbContext _myDbContext)
+    public class KnowledgeService : GenericRepository<Knowledge>
     {
+
+        public KnowledgeService(MyDbContext myDbcontext): base(myDbcontext) {
+        }
+
         public async Task<bool> AddKnowledge(Knowledge model) {
             _myDbContext.Knowledge.Add(model);
             var result = await _myDbContext.SaveChangesAsync();

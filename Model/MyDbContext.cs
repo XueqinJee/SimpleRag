@@ -11,5 +11,6 @@ namespace Model
 
         public DbSet<Knowledge> Knowledge { get; set; }
         public DbSet<KnowledgeInfo> KnowledgeInfo { get; set; }
+        public DbSet<ChatModel> ChatModel { get; set; }
     }
 }

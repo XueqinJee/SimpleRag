@@ -1,0 +1,48 @@
+﻿@page "/modelsetting"
+@inject NavigationManager Navigation
+
+<Form Model="@model"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed"
+      LabelColSpan="4"
+      WrapperColSpan="12">
+    <FormItem Label="模型描述">
+        <Input @bind-Value="@context.Name" />
+    </FormItem>
+    <FormItem Label="模型类型">
+        <Input @bind-Value="@context.Type" />
+    </FormItem>
+    <FormItem Label="AI类型">
+        <Input @bind-Value="@context.AiType" />
+    </FormItem>
+    <FormItem Label="请求地址">
+        <Input @bind-Value="@context.Endpoint" />
+    </FormItem>
+    <FormItem Label="模型名称">
+        <Input @bind-Value="@context.ModelName" />
+    </FormItem>
+    <FormItem Label="模型密钥">
+        <Input @bind-Value="@context.Key" />
+    </FormItem>
+
+    <FormItem WrapperColOffset="4" WrapperColSpan="12">
+        <Button Type="ButtonType.Primary" HtmlType="submit">
+            提交
+        </Button>
+        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/rag"))">
+            返回
+        </Button>
+    </FormItem>
+</Form>
+
+@code {
+    private ChatModel model = new ChatModel();
+
+    private async Task OnFinish(EditContext editContext) {
+        
+    }
+
+    private void OnFinishFailed(EditContext editContext) {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(model)}");
+    }
+}

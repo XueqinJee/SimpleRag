@@ -5,10 +5,10 @@
 @inject IMessageService _message
 
 <Form Model="@model"
-OnFinish="OnFinish"
-OnFinishFailed="OnFinishFailed"
-LabelColSpan="4"
-WrapperColSpan="16">
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed"
+      LabelColSpan="4"
+      WrapperColSpan="16">
     <FormItem Label="知识库名称">
         <Input @bind-Value="@context.Name" />
     </FormItem>
@@ -49,16 +49,13 @@ WrapperColSpan="16">
         public string? Description { get; set; }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         IsEdit = Id == null ? false : true;
-        if (!IsEdit)
-        {
+        if (!IsEdit) {
             return;
         }
         var data = await knowledgeService.GetKnowledgeById(Id);
-        if(data == null)
-        {
+        if (data == null) {
             Navigation.NavigateTo("/rag");
             await _message.Warning($"ID {Id} 不存在！").ConfigureAwait(false);
             return;
@@ -70,26 +67,21 @@ WrapperColSpan="16">
     }
 
     private async Task OnFinish(EditContext editContext) {
-        var data = new Knowledge
-        {
-            Name = model.Name,
-            Icon = model.Icon,
-            Description = model.Description
-        };
+        var data = new Knowledge {
+                Name = model.Name,
+                Icon = model.Icon,
+                Description = model.Description
+            };
         bool result;
 
-        if (IsEdit)
-        {
+        if (IsEdit) {
             data.Id = (int)Id;
             result = await knowledgeService.UpdateKnowledge(data);
-        }
-        else
-        {
+        } else {
             result = await knowledgeService.AddKnowledge(data);
         }
 
-        if (result)
-        {
+        if (result) {
             Navigation.NavigateTo("/rag");
             await _message.Success("执行成功！").ConfigureAwait(false);
             return;
